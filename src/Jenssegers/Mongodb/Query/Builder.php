@@ -859,9 +859,11 @@ class Builder extends QueryBuilder {
         extract($where);
 
         // Replace like with a MongoRegex instance.
-        if ($operator == 'like')
+        if (in_array($operator, array('like', 'not like')))
         {
-            $operator = '=';
+            // For inverse regexp operations, we can just use the $not operator
+            // and pass it a MongoRegex instence.
+            $operator =starts_with($operator, 'not') ? 'not' : '=';
             $regex = str_replace('%', '', $value);
 
             // Convert like to regular expression.
